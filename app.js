@@ -59,7 +59,10 @@ app.post('/register', async (req, res) => {
           alamat:"empty",
           foto:"empty",
         });
-        res.send({ msg: 'User Added' });
+        res.send({ message: 'Register Successfull', user: { 
+          username: username,
+          email: email,
+         } });
       } catch (err) {
         console.error('Registration failed:', err.message);
         res.status(500).json({ message: 'Registration failed', error: err.message });
