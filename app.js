@@ -40,29 +40,34 @@ app.get('/', (req, res) => {
 app.post('/register', async (req, res) => {
   const { username, email, password, confirmPassword } = req.body;
 
-  if (password == confirmPassword) {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const userDocRef = doc(firestore, UserCollection, user.uid);
-      await setDoc(userDocRef, {
-        username,
-        email,
-        noTelp:"empty",
-        alamat:"empty",
-        foto:"empty",
-      });
-      res.send({ message: 'Register Successful', user: { 
-        username: username,
-        email: email,
-       } });
-    } catch (err) {
-      console.error('Registration failed:', err.message);
-      res.status(500).json({ message: 'Registration failed', error: err.message });
-    }
+  const usersCollection = collection(firestore, UserCollection);
+  const q = query(usersCollection, where('username', '==', username));
+  const querySnapshot = await getDocs(q);
 
+  if (!querySnapshot.empty) {
+    return res.status(400).json({ message: 'User already exists' });
   }else{
-    return res.status(400).json({ message: 'Password and Confirm Password do not match' });
+    if (password == confirmPassword) {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userDocRef = doc(firestore, UserCollection, user.uid);
+        await setDoc(userDocRef, {
+          username,
+          email,
+          noTelp:"empty",
+          alamat:"empty",
+          foto:"empty",
+        });
+        res.send({ msg: 'User Added' });
+      } catch (err) {
+        console.error('Registration failed:', err.message);
+        res.status(500).json({ message: 'Registration failed', error: err.message });
+      }
+  
+    }else{
+      return res.status(400).json({ message: 'Password and Confirm Password do not match' });
+    }
   }
 
 });
@@ -77,15 +82,16 @@ app.post('/login', async (req, res) => {
 
     if (userDoc.exists()) {
       const userData = userDoc.data();
-      res.status(200).json({ message: 'Login successful', user: { uid: user.uid, ...userData } });
+      const token = nanoid(); // Menghasilkan token acak dengan Nanoid
+
+      res.status(200).json({ message: 'Login successfull', user: { uid: user.uid, ...userData , token } });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Login failed', error: error.message });
-  }
+    res.status(500).json({ message: 'Email or password is invalid', error: error.message });
+  }
 });
-
 
 // View Profile
 app.get('/profile/:userId', async (req, res) => {
