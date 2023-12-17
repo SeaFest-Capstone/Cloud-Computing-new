@@ -57,7 +57,7 @@ app.post('/register', async (req, res) => {
           email,
           noTelp:"empty",
           alamat:"empty",
-          foto:"empty",
+          photoProfile:"empty",
         });
         res.send({ message: 'Register Successfull', user: { 
           username: username,
