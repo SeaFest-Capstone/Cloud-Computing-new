@@ -187,7 +187,38 @@
     - Message: 'Error during checkout'
     - Error: Error message details.
 
----
+### Remove Fish from Cart
+
+#### Endpoint
+```http
+DELETE /cart-delete/:userId/:fishIdCart
+```
+
+#### Description
+Removes a fish from the user's cart based on `userId` and `fishIdCart`.
+
+#### URL Parameters
+- `userId`: User ID (String)
+- `fishIdCart`: Fish ID in the cart (String)
+
+#### Response
+- `200 OK`: Fish removed from cart successfully.
+- `404 Not Found`: Fish not found in the user's cart.
+- `500 Internal Server Error`: Internal server error.
+
+#### Response
+```json
+{
+  "message": "Fish removed from cart successfully"
+}
+```
+
+```json
+{
+  "error": "Fish not found in the user's cart"
+}
+```
+
 
 ## History and Scan Operations
 
