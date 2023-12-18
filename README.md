@@ -280,9 +280,7 @@
           "uid": "fish_id",
           "nameFish": "Fish Name",
           "price": 10.99,
-          "
-
-benefit": "Fish benefit",
+          "benefit": "Fish benefit",
           "habitat": "Fish habitat",
           "description": "Fish description",
           "userId": "user_id",
