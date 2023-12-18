@@ -348,6 +348,29 @@ app.post('/checkout/:userId', async (req, res) => {
   }
 });
 
+app.delete('/cart-delete/:userId/:fishIdCart', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const fishIdCart = req.params.fishIdCart;
+
+    // Remove fish from cart
+    const cartCollectionRef = collection(firestore, CartCollection);
+    const querySnapshot = await getDocs(query(cartCollectionRef, where('userId', '==', userId, 'fishIdCart', '==', fishIdCart)));
+
+    if (!querySnapshot.empty) {
+      const cartDoc = querySnapshot.docs[0];
+      await deleteDoc(cartDoc.ref);
+
+      res.status(200).json({ message: 'Fish removed from cart successfully' });
+    } else {
+      res.status(404).json({ error: 'Fish not found in the user\'s cart' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 // history dan scan==================================================================================================================
 
