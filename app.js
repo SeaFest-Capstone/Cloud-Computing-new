@@ -325,49 +325,35 @@ app.get('/view-cart/:userId', async (req, res) => {
 
 // View Cart nyimpen cekout
 app.post('/checkout/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  const { totalPrice, fishDetails } = req.body;
+  const { fishIdCart } = req.body;
 
   try {
     // Save the checkout details to CheckoutCollection
     const checkoutCollectionRef = collection(firestore, CheckoutCollection);
     const newCheckoutRef = await addDoc(checkoutCollectionRef, {
-      userId,
-      totalPrice,
-      items: fishDetails,
-      timestamp: serverTimestamp(),
+      fishIdCart
     });
+
+    // Remove checked-out items from CartCollection
+    const cartCollectionRef = collection(firestore, CartCollection);
+    const cartQuery = query(cartCollectionRef, where('fishIdCart', '==', fishIdCart));
+
+    const cartQuerySnapshot = await getDocs(cartQuery);
+    const cartDocs = cartQuerySnapshot.docs;
+
+    const cartDeletionPromises = cartDocs.map(async (cartDoc) => {
+      await deleteDoc(doc(cartCollectionRef, cartDoc.id));
+    });
+
+    await Promise.all(cartDeletionPromises);
 
     res.status(201).json({
       message: 'Checkout successful',
-      checkoutId: newCheckoutRef.id,
+      fishIdCart: fishIdCart,
     });
   } catch (err) {
     console.error('Error during checkout:', err.message);
     res.status(500).json({ message: 'Error during checkout', error: err.message });
-  }
-});
-
-app.delete('/cart-delete/:userId/:fishIdCart', async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const fishIdCart = req.params.fishIdCart;
-
-    // Remove fish from cart
-    const cartCollectionRef = collection(firestore, CartCollection);
-    const querySnapshot = await getDocs(query(cartCollectionRef, where('userId', '==', userId, 'fishIdCart', '==', fishIdCart)));
-
-    if (!querySnapshot.empty) {
-      const cartDoc = querySnapshot.docs[0];
-      await deleteDoc(cartDoc.ref);
-
-      res.status(200).json({ message: 'Fish removed from cart successfully' });
-    } else {
-      res.status(404).json({ error: 'Fish not found in the user\'s cart' });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
