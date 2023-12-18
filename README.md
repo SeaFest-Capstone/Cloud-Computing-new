@@ -1,279 +1,438 @@
-# Fish App API Documentation
+# FishApp API Documentation
 
 ## Authentication
 
-### Register
+### Register User
 
-- **Endpoint:** `/register`
-- **Method:** `POST`
-- **Description:** Registers a new user.
-- **Request Body:**
-  - `username` (string): User's username.
-  - `email` (string): User's email address.
-  - `password` (string): User's password.
-  - `confirmPassword` (string): Confirm the user's password.
-- **Response:**
-  - Success (Status 200):
-    - Message: 'Register Successful'
-    - User Object:
-      - `username` (string): User's username.
-      - `email` (string): User's email address.
-  - Failure (Status 400):
-    - Message: 'Password and Confirm Password do not match'
-  - Failure (Status 500):
-    - Message: 'Registration failed'
-    - Error: Error message details.
+**Endpoint:** `POST /register`
 
-### Login
+**Request:**
+```json
+{
+  "username": "example",
+  "email": "example@example.com",
+  "password": "password123",
+  "confirmPassword": "password123"
+}
+```
 
-- **Endpoint:** `/login`
-- **Method:** `POST`
-- **Description:** Logs in a registered user.
-- **Request Body:**
-  - `email` (string): User's email address.
-  - `password` (string): User's password.
-- **Response:**
-  - Success (Status 200):
-    - Message: 'Login successful'
-    - User Object:
-      - `uid` (string): User's unique identifier.
-      - Other user details.
-  - Failure (Status 404):
-    - Message: 'User not found'
-  - Failure (Status 500):
-    - Message: 'Login failed'
-    - Error: Error message details.
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "message": "Register Successful",
+    "user": {
+      "username": "example",
+      "email": "example@example.com"
+    }
+  }
+  ```
+
+- `400 Bad Request` - User already exists
+  ```json
+  {
+    "message": "User already exists"
+  }
+  ```
+
+- `400 Bad Request` - Password and Confirm Password do not match
+  ```json
+  {
+    "message": "Password and Confirm Password do not match"
+  }
+  ```
+
+- `500 Internal Server Error` - Email already used
+  ```json
+  {
+    "message": "Email already used",
+    "error": "Error message"
+  }
+  ```
+
+### Login User
+
+**Endpoint:** `POST /login`
+
+**Request:**
+```json
+{
+  "email": "example@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "message": "Login Successful",
+    "user": {
+      "uid": "user_id",
+      "username": "example",
+      "email": "example@example.com",
+      "token": "random_token"
+    }
+  }
+  ```
+
+- `404 Not Found` - User not found
+  ```json
+  {
+    "message": "User not found"
+  }
+  ```
+
+- `500 Internal Server Error` - Email or password is invalid
+  ```json
+  {
+    "message": "Email or password is invalid",
+    "error": "Error message"
+  }
+  ```
+
+## User Profile
 
 ### View Profile
 
-- **Endpoint:** `/profile/:userId`
-- **Method:** `GET`
-- **Description:** Retrieves the profile information of a user.
-- **Parameters:**
-  - `userId` (string): Unique identifier of the user.
-- **Response:**
-  - Success (Status 200):
-    - Message: 'Successful view profile'
-    - Data: User profile details.
-  - Failure (Status 404):
-    - Message: 'User not found'
-  - Failure (Status 500):
-    - Message: 'Error fetching user profile'
-    - Error: Error message details.
+**Endpoint:** `GET /profile/:userId`
+
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "message": "Successful view profile",
+    "data": {
+      "username": "example",
+      "email": "example@example.com",
+      "noTelp": "empty",
+      "alamat": "empty",
+      "photoProfile": "empty"
+    }
+  }
+  ```
+
+- `404 Not Found` - User not found
+  ```json
+  {
+    "message": "User not found"
+  }
+  ```
 
 ### Update Profile
 
-- **Endpoint:** `/updateProfile/:uid`
-- **Method:** `PUT`
-- **Description:** Updates the profile information of a user.
-- **Parameters:**
-  - `uid` (string): Unique identifier of the user.
-- **Request Body:**
-  - User details to update.
-- **Response:**
-  - Success (Status 200):
-    - Message: 'User updated successfully'
-    - Photo Profile: URL of the updated profile photo.
-  - Failure (Status 500):
-    - Message: 'Error updating user'
-    - Error: Error message details.
+**Endpoint:** `PUT /updateProfile/:uid`
 
----
+**Request:**
+- Form data including optional `photoProfile` field
 
-## Fish Operations
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "message": "User updated successfully",
+    "photoProfile": "updated_photo_url"
+  }
+  ```
+
+- `500 Internal Server Error` - Error updating user
+  ```json
+  {
+    "message": "Error updating user",
+    "error": "Error message"
+  }
+  ```
+
+## Fish
 
 ### Add Fish
 
-- **Endpoint:** `/add-fish`
-- **Method:** `POST`
-- **Description:** Adds a new fish to the database.
-- **Request Body:**
-  - Fish details (nameFish, price, benefit, habitat, description, userId).
-  - Fish photo (uploaded using `fishPhoto` field).
-- **Response:**
-  - Success (Status 201):
-    - Message: 'Fish added successfully'
-    - Fish ID: Unique identifier of the added fish.
-    - Photo URL: URL of the uploaded fish photo.
-  - Failure (Status 500):
-    - Message: 'Error adding fish'
-    - Error: Error message details.
+**Endpoint:** `POST /add-fish`
+
+**Request:**
+- Form data including `nameFish`, `price`, `benefit`, `habitat`, `description`, `userId`, and optional `fishPhoto`
+
+**Response:**
+- `201 Created` - Success
+  ```json
+  {
+    "message": "Fish added successfully",
+    "fishId": "new_fish_id",
+    "photoUrl": "fish_photo_url"
+  }
+  ```
+
+- `500 Internal Server Error` - Error adding fish
+  ```json
+  {
+    "message": "Error adding fish",
+    "error": "Error message"
+  }
+  ```
 
 ### View Fish by Habitat
 
-- **Endpoint:** `/fish/habitat/:habitat`
-- **Method:** `GET`
-- **Description:** Retrieves a list of fish based on their habitat.
-- **Parameters:**
-  - `habitat` (string): Habitat of the fish.
-- **Response:**
-  - Success (Status 200):
-    - Message: 'Successfully view all fish data by habitat'
-    - ListFish: Array of fish objects with UID included.
-  - Failure (Status 500):
-    - Message: 'Error fetching fish by habitat'
-    - Error: Error message details.
+**Endpoint:** `GET /fish/habitat/:habitat`
+
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "message": "Successfully view all fish data by habitat",
+    "listFish": [
+      {
+        "uid": "fish_id",
+        "nameFish": "Fish Name",
+        "price": 10.99,
+        "benefit": "Fish benefit",
+        "habitat": "Fish habitat",
+        "description": "Fish description",
+        "userId": "user_id",
+        "photoUrl": "fish_photo_url"
+      }
+    ]
+  }
+  ```
+
+- `500 Internal Server Error` - Error fetching fish by habitat
+  ```json
+  {
+    "message": "Error fetching fish by habitat",
+    "error": "Error message"
+  }
+  ```
 
 ### View Fish Detail
 
-- **Endpoint:** `/fish/detail/:fishId`
-- **Method:** `GET`
-- **Description:** Retrieves detailed information about a specific fish.
-- **Parameters:**
-  - `fishId` (string): Unique identifier of the fish.
-- **Response:**
-  - Success (Status 200):
-    - Message: 'Successfully view detail fish'
-    - Fish: Fish object with UID included.
-  - Failure (Status 404):
-    - Message: 'Fish not found'
-  - Failure (Status 500):
-    - Message: 'Error fetching fish'
-    - Error: Error message details.
+**Endpoint:** `GET /fish/detail/:fishId`
 
----
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "message": "Successfully view detail fish",
+    "fish": {
+      "uid": "fish_id",
+      "nameFish": "Fish Name",
+      "price": 10.99,
+      "benefit": "Fish benefit",
+      "habitat": "Fish habitat",
+      "description": "Fish description",
+      "userId": "user_id",
+      "photoUrl": "fish_photo_url"
+    }
+  }
+  ```
 
-## Cart Operations
+- `404 Not Found` - Fish not found
+  ```json
+  {
+    "message": "Fish not found"
+  }
+  ```
+
+## Cart
 
 ### Add to Cart
 
-- **Endpoint:** `/add-to-cart/:userId`
-- **Method:** `POST`
-- **Description:** Adds a fish item to the user's cart.
-- **Parameters:**
-  - `userId` (string): Unique identifier of the user.
-- **Request Body:**
-  - `fishIdCart` (string): Unique identifier of the fish item.
-- **Response:**
-  - Success (Status 201):
-    - Message: 'Item added to cart'
-    - CartItemId: Unique identifier of the added cart item.
-  - Failure (Status 500):
-    - Message: 'Error adding to cart'
-    - Error: Error message details.
+**Endpoint:** `POST /add-to-cart/:userId`
+
+**Request:**
+```json
+{
+  "fishIdCart": "US-random_id"
+}
+```
+
+**Response:**
+- `201 Created` - Success
+  ```json
+  {
+    "message": "Item added to cart",
+    "cartItemId": "new_cart_item_id"
+  }
+  ```
+
+- `500 Internal Server Error` - Error adding to cart
+  ```json
+  {
+    "message": "Error adding to cart",
+    "error": "Error message"
+  }
+  ```
 
 ### View Cart
 
-- **Endpoint:** `/view-cart/:userId`
-- **Method:** `GET`
-- **Description:** Retrieves the user's cart items.
-- **Parameters:**
-  - `userId` (string): Unique identifier of the user.
-- **Response:**
-  - Success (Status 200):
-    - Message: 'Cart fish found'
-    - Bookmarks: Array of cart items with associated fish data.
-  - Failure (Status 404):
-    - Message: 'No bookmarks found for this user'
-  - Failure (Status 500):
-    - Message: 'Error getting cart'
-    - Error: Error message details.
+**Endpoint:** `GET /view-cart/:userId`
 
-### Checkout
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "message": "Cart fish found",
+    "cart": [
+      {
+        "cart": {
+          "userId": "user_id",
+          "fishIdCart": "US-random_id"
+        },
+        "fishData": {
+          "uid": "fish_id",
+          "nameFish": "Fish Name",
+          "price": 10.99,
+          "
 
-- **Endpoint:** `/checkout/:userId`
-- **Method:** `POST`
-- **Description:** Completes the checkout process and saves the details to CheckoutCollection.
-- **Parameters:**
-  - `userId` (string): Unique identifier of the user.
-- **Request Body:**
-  - `totalPrice` (number): Total price of the checkout.
-  - `fishDetails` (array): Array of fish items with details.
-- **Response:**
-  - Success (Status 201):
-    - Message: 'Checkout successful'
-    - CheckoutId: Unique identifier of the checkout.
-  - Failure (Status 500):
-    - Message: 'Error during checkout'
-    - Error: Error message details.
+benefit": "Fish benefit",
+          "habitat": "Fish habitat",
+          "description": "Fish description",
+          "userId": "user_id",
+          "photoUrl": "fish_photo_url"
+        }
+      }
+    ]
+  }
+  ```
 
-### Remove Fish from Cart
+- `404 Not Found` - No bookmarks found for this user
+  ```json
+  {
+    "message": "No bookmarks found for this user"
+  }
+  ```
 
-#### Endpoint
-```http
-DELETE /cart-delete/:userId/:fishIdCart
-```
+### Checkout Cart
 
-#### Description
-Removes a fish from the user's cart based on `userId` and `fishIdCart`.
+**Endpoint:** `POST /checkout/:userId`
 
-#### URL Parameters
-- `userId`: User ID (String)
-- `fishIdCart`: Fish ID in the cart (String)
-
-#### Response
-- `200 OK`: Fish removed from cart successfully.
-- `404 Not Found`: Fish not found in the user's cart.
-- `500 Internal Server Error`: Internal server error.
-
-#### Response
+**Request:**
 ```json
 {
-  "message": "Fish removed from cart successfully"
+  "fishIdCart": "US-random_id"
 }
 ```
 
-```json
-{
-  "error": "Fish not found in the user's cart"
-}
-```
+**Response:**
+- `201 Created` - Checkout successful
+  ```json
+  {
+    "message": "Checkout successful",
+    "fishIdCart": "US-random_id"
+  }
+  ```
 
+- `500 Internal Server Error` - Error during checkout
+  ```json
+  {
+    "message": "Error during checkout",
+    "error": "Error message"
+  }
+  ```
 
-## History and Scan Operations
+## History and Scan
 
 ### Add Scan Result
 
-- **Endpoint:** `/addScanResult`
-- **Method:** `POST`
-- **Description:** Adds a new scan result to the database.
-- **Request Body:**
-  - `userId` (string): Unique identifier of the user.
-  - `fishStatus` (string): Status of the scanned fish.
-  - `fishName` (string): Name of the scanned fish.
-- **Request File:**
-  - `fishPhoto`: Image file of the scanned fish.
-- **Response:**
-  - Success (Status 200):
-    - Message: '
+**Endpoint:** `POST /addScanResult`
 
-Scan Result Added'
-    - PhotoUrl: URL of the uploaded scan photo.
-  - Failure (Status 400):
-    - Message: 'No file uploaded' or 'File has no original name'
-  - Failure (Status 500):
-    - Message: 'Error adding scan result'
-    - Error: Error message details.
+**Request:**
+- Form data including `userId`, `fishStatus`, `fishName`, and `fishPhoto`
 
-### View Scan History
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "message": "Scan Result Added",
+    "photoUrl": "scan_result_photo_url"
+  }
+  ```
 
-- **Endpoint:** `/scan-history/:userId`
-- **Method:** `GET`
-- **Description:** Retrieves the scan history of a user.
-- **Parameters:**
-  - `userId` (string): Unique identifier of the user.
-- **Response:**
-  - Array of scan history objects.
-  - Success (Status 200):
-    - Scan history data.
-  - Failure (Status 500):
-    - Message: 'Error fetching scan history'
-    - Error: Error message details.
+- `400 Bad Request` - No file uploaded or file has no original name
+  ```json
+  {
+    "message": "No file uploaded"
+  }
+  ```
 
-### View Fish Details from History
+- `500 Internal Server Error` - Error adding scan result
+  ```json
+  {
+    "message": "Error adding scan result",
+    "error": "Error message"
+  }
+  ```
 
-- **Endpoint:** `/history-detail`
-- **Method:** `GET`
-- **Description:** Retrieves detailed information about a fish from scan history.
-- **Request Body:**
-  - `fishName` (string): Name of the fish to retrieve details.
-- **Response:**
-  - Success (Status 200):
-    - FishName: Name of the fish.
-    - UserId: Unique identifier of the user.
-    - FishDetails: Detailed information about the fish.
-  - Failure (Status 404):
-    - Message: 'No history found for the fish'
-  - Failure (Status 500):
-    - Message: 'Error fetching history detail'
-    - Error: Error message details.
+### Get Scan History by UserId
+
+**Endpoint:** `GET /scan-history/:userId`
+
+**Response:**
+- `200 OK` - Success
+  ```json
+  [
+    {
+      "scanId": "SCAN-random_id",
+      "userId": "user_id",
+      "fishStatus": "Fish Status",
+      "fishName": "Fish Name",
+      "photoUrl": "scan_result_photo_url",
+      "scanDate": "scan_date"
+    }
+  ]
+  ```
+
+- `500 Internal Server Error` - Error fetching scan history
+  ```json
+  {
+    "message": "Error fetching scan history",
+    "error": "Error message"
+  }
+  ```
+
+### Get Detail Fish from History by FishName
+
+**Endpoint:** `GET /history-detail`
+
+**Request:**
+```json
+{
+  "fishName": "Fish Name"
+}
+```
+
+**Response:**
+- `200 OK` - Success
+  ```json
+  {
+    "fishName": "Fish Name",
+    "userId": "user_id",
+    "fishDetails": {
+      "uid": "fish_id",
+      "nameFish": "Fish Name",
+      "price": 10.99,
+      "benefit": "Fish benefit",
+      "habitat": "Fish habitat",
+      "description": "Fish description",
+      "userId": "user_id",
+      "photoUrl": "fish_photo_url"
+    }
+  }
+  ```
+
+- `404 Not Found` - No history found for the fish
+  ```json
+  {
+    "message": "No history found for the fish"
+  }
+  ```
+
+- `500 Internal Server Error` - Error fetching history detail
+  ```json
+  {
+    "message": "Error fetching history detail",
+    "error": "Error message"
+  }
+  ```
+
+---
+
+This documentation provides details on the endpoints, request formats, and possible response scenarios for the FishApp API. Use the provided information to interact with the API endpoints accordingly.
