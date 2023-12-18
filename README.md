@@ -22,6 +22,8 @@ Fully use Google Cloud Platform (GCP)
 <h2>Implementation</h2>
   <li>Provide Firebase Services (Firebase Authentication) to store users account.</li>
   <li>Build a REST API location and make an endpoint of it.</li>
+  <li>Create a bucket in gloud storage to store fish images and profile photos.</li>
+  <li>Create a database in firebase to store data (fish and users)<li>
   <li>Deploy the API on Cloud Run to make it accessible.</li>
   <li>Provide APIs and Services (Features Application).</li>
   
