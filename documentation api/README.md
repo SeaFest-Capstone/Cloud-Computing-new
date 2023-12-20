@@ -386,48 +386,56 @@
   }
   ```
 
-### Get Detail Fish from History by FishName
+# Scan History API Documentation
 
-**Endpoint:** `GET /history-detail`
+## Get Scan History by User ID
 
-**Request:**
+### Endpoint
+
+`GET /scan-history/:userId`
+
+### Request Parameters
+
+- `userId` (string): The unique identifier of the user.
+
+### Response
+
+**Success Response (200 OK):**
+
 ```json
 {
-  "fishName": "Fish Name"
+  "message": "Fish fetched successfully",
+  "listScan": [
+    {
+      "photoUrl": "examplePhotoUrl",
+      "userId": "exampleUserId",
+      "scanDate": "2023-12-20T12:34:56.789Z",
+      "scanId": "exampleScanId",
+      "fishStatus": "exampleFishStatus",
+      "description": "exampleDescription",
+      "benefit": "exampleBenefit",
+      "habitat": "exampleHabitat",
+      "fishName": "exampleFishName"
+    },
+    // Additional fish scan data...
+  ]
 }
 ```
 
-**Response:**
-- `200 OK` - Success
+**Error Responses:**
+
+- `404 Not Found`: If no scan history is found for the given user ID.
   ```json
   {
-    "fishName": "Fish Name",
-    "userId": "user_id",
-    "fishDetails": {
-      "uid": "fish_id",
-      "nameFish": "Fish Name",
-      "price": 10.99,
-      "benefit": "Fish benefit",
-      "habitat": "Fish habitat",
-      "description": "Fish description",
-      "userId": "user_id",
-      "photoUrl": "fish_photo_url"
-    }
+    "message": "No scan history found for the user"
   }
   ```
 
-- `404 Not Found` - No history found for the fish
+- `500 Internal Server Error`: If there's an error fetching the scan history.
   ```json
   {
-    "message": "No history found for the fish"
-  }
-  ```
-
-- `500 Internal Server Error` - Error fetching history detail
-  ```json
-  {
-    "message": "Error fetching history detail",
-    "error": "Error message"
+    "message": "Error fetching scan history",
+    "error": "Error details..."
   }
   ```
 

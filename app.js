@@ -410,68 +410,51 @@ app.post('/addScanResult', upload.single('fishPhoto'), async (req, res) => {
   }
 });
 
+
 // Get Scan History by UserId
 app.get('/scan-history/:userId', async (req, res) => {
   const userId = req.params.userId;
 
   try {
-    const historyCollectionRef = collection(firestore,HistoryCollection);
+    const historyCollectionRef = collection(firestore, HistoryCollection);
     const q = query(historyCollectionRef, where('userId', '==', userId));
     const querySnapshot = await getDocs(q);
 
-    // Map query results to an array
-    const scanHistoryArray = querySnapshot.docs.map((doc) => doc.data());
+    const listFish = [];
 
-    res.status(200).json(scanHistoryArray);
+    for (const doc of querySnapshot.docs) {
+      const scanData = doc.data();
+
+      const fishName = scanData.fishName;
+      const fishCollectionRef = collection(firestore, FishCollection);
+      const fishQuery = query(fishCollectionRef, where('nameFish', '==', fishName));
+      const fishQuerySnapshot = await getDocs(fishQuery);
+
+      if (!fishQuerySnapshot.empty) {
+        const fishData = fishQuerySnapshot.docs[0].data();
+        const formattedFishData = {
+          photoUrl: fishData.photoUrl,
+          userId: scanData.userId,
+          scanDate: scanData.scanDate,
+          scanId: scanData.scanId,
+          fishStatus: scanData.fishStatus,
+          description: fishData.description,
+          benefit: fishData.benefit,
+          habitat: fishData.habitat,
+          fishName: scanData.fishName,
+        };
+
+        listFish.push(formattedFishData);
+      }
+    }
+
+    res.status(200).json({
+      message: 'Fish fetched successfully',
+      listScan: listFish,
+    });
   } catch (err) {
     console.error('Error fetching scan history:', err.message);
     res.status(500).json({ message: 'Error fetching scan history', error: err.message });
-  }
-});
-
-// Get Detail Fish from History by FishName
-app.get('/history-detail', async (req, res) => {
-  const { fishName } = req.body;
-
-  try {
-    // Reference to the HistoryCollection
-    const historyCollectionRef = collection(firestore, HistoryCollection);
-
-    // Query scan history by fishName
-    const q = query(historyCollectionRef, where('fishName', '==', fishName));
-    const querySnapshot = await getDocs(q);
-
-    // Check if there's any history for the given fishName
-    if (querySnapshot.empty) {
-      return res.status(404).json({ message: 'No history found for the fish' });
-    }
-
-    // Assuming there's only one history for the given fishName
-    const historyData = querySnapshot.docs[0].data();
-    const { fishName: historyFishName, userId } = historyData; // Rename fishName here
-
-    // Retrieve details of the fish from FishCollection
-    const fishCollectionRef = collection(firestore, FishCollection);
-    const fishQuery = query(fishCollectionRef, where('nameFish', '==', historyFishName)); // Use the renamed variable here
-    const fishSnapshot = await getDocs(fishQuery);
-
-    if (fishSnapshot.empty) {
-      return res.status(404).json({ message: 'Fish details not found' });
-    }
-
-    const fishDetails = fishSnapshot.docs[0].data();
-
-    // Combine history data with fish details
-    const result = {
-      fishName: historyFishName, // Use the renamed variable here
-      userId,
-      fishDetails,
-    };
-
-    res.status(200).json(result);
-  } catch (err) {
-    console.error('Error fetching history detail:', err.message);
-    res.status(500).json({ message: 'Error fetching history detail', error: err.message });
   }
 });
 
