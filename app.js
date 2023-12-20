@@ -456,6 +456,9 @@ app.get('/scan-history/:userId', async (req, res) => {
         listFish.push(formattedFishData);
       }
     }
+    
+    // Sort listFish based on scanDate in descending order
+    listFish.sort((a, b) => new Date(b.scanDate) - new Date(a.scanDate));
 
     res.status(200).json({
       message: 'Fish fetched successfully',
