@@ -231,33 +231,47 @@
   }
   ```
 
-## Cart
+# Cart
 
-### Add to Cart
+## Add Item to Cart
 
-**Endpoint:** `POST /add-to-cart/:userId`
+### Endpoint
 
-**Request:**
+`POST /add-to-cart/:userId`
+
+### Request Parameters
+
+- `userId` (string): The unique identifier of the user.
+
+### Request Body
+
+- `fishIdCart` (string): The unique identifier of the fish item to be added to the cart.
+
+### Response
+
+**Success Response (201 Created):**
+
 ```json
 {
-  "fishIdCart": "US-random_id"
+  "message": "Item added to cart",
+  "cartItemId": "newCartItemRefId"
 }
 ```
 
-**Response:**
-- `201 Created` - Success
+**Error Responses:**
+
+- `400 Bad Request`: If the item with the specified `fishIdCart` is already in the user's cart.
   ```json
   {
-    "message": "Item added to cart",
-    "cartItemId": "new_cart_item_id"
+    "message": "Item already in the cart"
   }
   ```
 
-- `500 Internal Server Error` - Error adding to cart
+- `500 Internal Server Error`: If there's an error adding the item to the cart.
   ```json
   {
     "message": "Error adding to cart",
-    "error": "Error message"
+    "error": "Error details..."
   }
   ```
 
@@ -326,6 +340,7 @@
   }
   ```
 
+
 ## History and Scan
 
 ### Add Scan Result
@@ -386,7 +401,7 @@
   }
   ```
 
-# Scan History API Documentation
+# Scan History
 
 ## Get Scan History by User ID
 

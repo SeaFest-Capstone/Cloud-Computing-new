@@ -272,6 +272,14 @@ app.post('/add-to-cart/:userId', async (req, res) => {
 
   try {
     const cartCollectionRef = collection(firestore, CartCollection);
+    const existingCartItemQuery = query(cartCollectionRef, where('userId', '==', userId), where('fishIdCart', '==', fishIdCart));
+    const existingCartItemSnapshot = await getDocs(existingCartItemQuery);
+
+    if (!existingCartItemSnapshot.empty) {
+      // If the fishIdCart already exists, return a message indicating it's already in the cart
+      return res.status(400).json({ message: 'Item already in the cart' });
+    }
+    
     const newCartItemRef = await addDoc(cartCollectionRef, {
       userId,
       fishIdCart,
