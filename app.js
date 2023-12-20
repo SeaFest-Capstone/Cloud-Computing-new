@@ -433,7 +433,7 @@ app.get('/scan-history/:userId', async (req, res) => {
       if (!fishQuerySnapshot.empty) {
         const fishData = fishQuerySnapshot.docs[0].data();
         const formattedFishData = {
-          photoUrl: fishData.photoUrl,
+          photoUrl: scanData.photoUrl,
           userId: scanData.userId,
           scanDate: scanData.scanDate,
           scanId: scanData.scanId,
