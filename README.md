@@ -1,6 +1,6 @@
 <h1>SeaFest Cloud-Computing Path<h1>
 <h1 align="center">
-  <img align="center" src="./seaFest.jpg"  width="270"></img>
+  <img align="center" src="./seaFest.jpg"  width="100"></img>
 <br>
 SeaFest
 </h1>
