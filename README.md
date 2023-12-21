@@ -1,10 +1,10 @@
+<h1>SeaFest Cloud-Computing Path<h1>
 <h1 align="center">
   <img align="center" src="./seaFest.jpg"  width="270"></img>
 <br>
 SeaFest
 </h1>
 
-<h1>Cloud Computing Path<h1>
 # Profile
 
 ### Team ID : CH2-PS436
