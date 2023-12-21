@@ -42,7 +42,7 @@ Fully use Google Cloud Platform (GCP)
   <li>Build a REST API using Node.js</li>
     Method : GET and Post</br>
     Auth Required : NO </br>
-    No Data Must Provided
+    No Data Must Provided</br>
 
   <li>Deploy on Cloud Run</li>
     Endpoint : https://capstonefish-yz6ahwzkra-et.a.run.app
